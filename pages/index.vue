@@ -78,12 +78,14 @@
         <!-- Bottom Navigation -->
         <BottomNav class="absolute bottom-4 left-3 right-3 z-20" />
 
-        <!-- Bottom Sheets -->
+        <!-- Bottom Sheets (mobile) -->
         <GardenSheet v-if="ui.openSheet === 'garden'" />
         <JournalSheet v-if="ui.openSheet === 'journal'" />
         <ProfileSheet v-if="ui.openSheet === 'profile'" />
-        <FlowerPickerSheet v-if="ui.openSheet === 'flower-picker'" />
       </div>
+
+      <!-- Flower Picker (mobile + desktop: renders as bottom sheet on mobile, modal on desktop) -->
+      <FlowerPickerSheet v-if="ui.openSheet === 'flower-picker'" />
     </template>
   </div>
 </template>

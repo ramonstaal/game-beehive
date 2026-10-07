@@ -33,6 +33,18 @@
           </div>
         </div>
 
+        <!-- Flowers strip -->
+        <div v-if="garden.flowers.length > 0" class="flex gap-2 mb-3 overflow-x-auto pb-1">
+          <div
+            v-for="flower in garden.flowers"
+            :key="flower.id"
+            class="flex-shrink-0 w-14 h-14 rounded-hive-md bg-hive-warm/50 flex flex-col items-center justify-center"
+          >
+            <span class="text-xl hive-flower">{{ getFlowerIcon(flower.speciesId) }}</span>
+            <span class="text-[9px] text-hive-ink-muted capitalize">{{ flower.state }}</span>
+          </div>
+        </div>
+
         <HiveButton variant="primary" icon="🌱" class="w-full" @click="ui.openSheetById('flower-picker')">
           Plant a flower
         </HiveButton>
@@ -73,10 +85,15 @@
 import { useGardenStore } from '~/stores/garden'
 import { useWorldStore } from '~/stores/world'
 import { useUiStore } from '~/stores/ui'
+import { DEMO_FLOWER_SPECIES } from '~/lib/game/fixtures-species'
 
 const garden = useGardenStore()
 const world = useWorldStore()
 const ui = useUiStore()
+
+function getFlowerIcon(speciesId: string) {
+  return DEMO_FLOWER_SPECIES.find(s => s.id === speciesId)?.visualKey || '🌱'
+}
 
 function selectGarden(id: string) {
   garden.selectGarden(id)
