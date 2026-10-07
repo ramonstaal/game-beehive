@@ -42,11 +42,74 @@ Prove the game looks good. Build: map, custom style, gardens, flowers, animated 
 
 ---
 
+## Phase 1 — Playable Single-Player ✅ COMPLETE
+
+### Goal
+Auth, garden persistence, flowers, hive, honey, journal — all backed by Supabase.
+
+### What Was Built
+
+1. **Supabase Schema** — 7 migrations applied to remote project `qpvizapftjjjcupojbpl`:
+   - `profiles` (extends auth.users with trigger)
+   - `gardens` + `hives` (one-to-one, owner-tracked)
+   - `flower_species` + `garden_flowers` (catalog + instances)
+   - `world_cells` + `bee_flows` (simulation tables, server-only write)
+   - `discoveries` + `global_events` + `game_ticks`
+2. **RLS Policies** — Every table has proper Row Level Security:
+   - Public read for gardens, hives, flowers, species, world data, events
+   - Owner-only write for personal data (profile, garden, flowers, discoveries)
+   - Server-only write for simulation tables (world_cells, bee_flows, game_ticks)
+3. **Gameplay RPCs** — Secure server-side functions:
+   - `create_garden(h3_cell, name, lat, lng)` — creates garden + hive atomically
+   - `plant_flower(garden_id, species_id, slot_index)` — ownership verified, slot checked
+   - `harvest_honey(garden_id, amount)` — deducts with balance check
+   - `record_discovery(...)` — idempotent via unique constraint
+   - `get_nearby_gardens(lat, lng, radius_km)` — spatial query
+4. **Auth System** — Full auth flow in frontend:
+   - Sign up with email + password + garden name
+   - Sign in with password
+   - Magic link (passwordless)
+   - Auth state persistence with `onAuthStateChange` listener
+   - `AuthModal.vue` component with tabbed sign-in/sign-up UI
+5. **Supabase Client** — Typed client with database types:
+   - `app/lib/supabase/client.ts` — singleton client using runtime config
+   - `app/lib/supabase/database.types.ts` — full TypeScript definitions for all tables
+6. **Store Integration** — All stores now call Supabase:
+   - `player.ts` — auth session, profile fetch, signUp/signIn/signOut
+   - `garden.ts` — `fetchMyGarden()`, `createGarden()`, `plantFlower()` with RPC fallback to local demo
+   - `world.ts` — `fetchGardens()`, `fetchEvents()` from Supabase
+   - `journal.ts` — `fetchDiscoveries()`, `recordDiscovery()` via RPC
+7. **App Shell Updated** — `app.vue` now:
+   - Initializes auth on mount
+   - Shows `AuthModal` when not authenticated (with demo skip option)
+   - Fetches real data after successful auth
+   - Falls back to demo data for exploration without account
+
+### Build Status
+- `nuxt generate` produces static output ✅
+- All migrations applied to remote Supabase ✅
+- GitHub Actions workflow ready ✅
+- Pushed to https://github.com/ramonstaal/game-beehive.git ✅
+
+---
+
+## Decisions Log
+
+| Date | Decision | Rationale |
+|------|----------|-----------|
+| 2026-10-07 | Remote-only Supabase | Remote project is empty; no local Docker needed |
+| 2026-10-07 | Tailwind + custom components | More playful than PrimeVue's generic admin aesthetic |
+| 2026-10-07 | OSM raster tiles for Phase 0 | Simple; upgrade to MapTiler vector style later |
+| 2026-10-07 | Emoji icons for Phase 0 | Quick prototyping; replace with custom SVG later |
+| 2026-10-07 | RPCs for gameplay mutations | Prevents clients from arbitrarily setting honey/bee counts |
+| 2026-10-07 | Demo fallback in stores | App works without auth for exploration; graceful degradation |
+
+---
+
 ## Next Phases
 
-1. **Phase 1** — Auth, garden persistence, real data from Supabase
-2. **Phase 2** — Shared world, multiple gardens, realtime updates
-3. **Phase 3** — World simulation tick, weather, bee movement rules
-4. **Phase 4** — Discovery system, events, community stats
-5. **Phase 5** — Sound, polish, accessibility, performance
+1. **Phase 2** — Shared world, multiple gardens, realtime updates
+2. **Phase 3** — World simulation tick, weather, bee movement rules
+3. **Phase 4** — Discovery system, events, community stats
+4. **Phase 5** — Sound, polish, accessibility, performance
 
