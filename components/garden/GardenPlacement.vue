@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed inset-0 z-[150] flex flex-col items-center justify-center p-6 pointer-events-none">
+  <div class="fixed inset-0 z-[150] flex flex-col items-center justify-end pb-8 p-6 pointer-events-none">
     <!-- Instruction overlay -->
     <div class="hive-card px-6 py-4 text-center pointer-events-auto mb-4 animate-hive-float">
       <p class="font-display font-bold text-lg text-hive-ink mb-1">📍 Place Your Garden</p>
@@ -53,8 +53,8 @@ onMounted(() => {
   pendingCell.value = getCellCenter(props.lat, props.lng)
 })
 
-watch(() => [props.lat, props.lng], () => {
-  pendingCell.value = getCellCenter(props.lat, props.lng)
+watch(() => [props.lat, props.lng], ([lat, lng]) => {
+  pendingCell.value = getCellCenter(lat, lng)
 })
 
 async function confirm() {

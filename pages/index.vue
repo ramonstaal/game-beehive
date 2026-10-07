@@ -111,6 +111,20 @@ const showAuth = computed(() => {
   return isReady.value && !player.isAuthenticated && !player.profile
 })
 
+// Watch for map clicks during garden placement
+watch(() => ui.selectedMapObject, (val) => {
+  if (!val || !needsGardenPlacement.value) return
+  if (val.startsWith('lat:')) {
+    const parts = val.split(',')
+    const lat = parseFloat(parts[0].split(':')[1])
+    const lng = parseFloat(parts[1].split(':')[1])
+    if (!isNaN(lat) && !isNaN(lng)) {
+      placementLat.value = lat
+      placementLng.value = lng
+    }
+  }
+})
+
 onMounted(async () => {
   // Initialize auth state
   await player.initAuth()
