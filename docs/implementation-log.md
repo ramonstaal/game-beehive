@@ -106,7 +106,7 @@ Auth, garden persistence, flowers, hive, honey, journal — all backed by Supaba
 
 ---
 
-## Phase 2 — Shared World 🚧 IN PROGRESS
+## Phase 2 — Shared World ✅ COMPLETE
 
 ### Goal
 Multiple gardens, world cells, aggregate bee flow, realtime, region filtering.
@@ -114,12 +114,60 @@ Multiple gardens, world cells, aggregate bee flow, realtime, region filtering.
 ### Acceptance
 > Two browsers in different accounts can see the same garden activity and bee flows.
 
-### Plan
-1. **H3 Integration** — Use h3-js for cell-based garden placement
-2. **Garden Placement Flow** — Click map → snap to H3 cell → create garden
-3. **Region-based Queries** — Load only gardens/cells in viewport
-4. **Realtime Subscriptions** — Live updates for gardens, flowers, events
-5. **Shared Garden Visibility** — Show other players' gardens with owner names
-6. **Bee Flows from DB** — Load real aggregate bee flows
-7. **Interactive Map** — Click gardens to inspect, click map to place
+### What Was Built
+
+1. **H3 Integration** — `app/composables/useH3.ts`
+   - `latLngToCell` / `cellToLatLng` / `gridDisk` utilities
+   - Configurable resolution (default: 9)
+   - `getCellCenter()` snaps any lat/lng to H3 cell center for privacy
+
+2. **Garden Placement Flow** — `app/components/garden/GardenPlacement.vue`
+   - Full-screen map overlay when authenticated user has no garden
+   - Shows H3 cell info and confirm/cancel buttons
+   - Calls `create_garden` RPC on confirm
+   - Falls back to demo mode if cancelled
+
+3. **Region-based Queries** — `app/stores/world.ts`
+   - `fetchGardensInBounds(minLat, maxLat, minLng, maxLng)` — viewport-filtered Supabase query
+   - Auto-fetches new region when map moves (300ms debounce)
+   - `nearbyGardens` computed filters to visible area
+   - `fetchWorldCells(cells[])` — loads cell data by H3 cell IDs
+   - `fetchBeeFlows(sinceMinutes)` — loads recent aggregate flows
+
+4. **Realtime Subscriptions** — `app/stores/world.ts`
+   - `subscribeToGardens()` — Postgres Changes on `gardens` table → auto-refetch viewport
+   - `subscribeToEvents()` — Postgres Changes on `global_events` → refetch events
+   - `unsubscribeAll()` — cleanup on unmount
+   - Channels: `world:gardens`, `world:events`
+
+5. **Shared Garden Visibility**
+   - Garden markers show owner name labels beneath icons
+   - Player garden gets honey-colored marker, others get green
+   - `profiles:owner_id(username)` joined in garden queries
+   - Click any garden marker → toast with name/flower/bee stats
+
+6. **Interactive Map** — `app/composables/useHiveMap.ts` + `app/components/map/HiveMap.vue`
+   - `addClickListener` / `removeClickListener` for map interactions
+   - `onMoveEnd` callback for viewport change detection
+   - `getBounds()` returns current map bounds for region queries
+   - Garden markers have click handlers + hover scale animation
+   - Auto-refreshes markers when `world.gardens` changes
+
+7. **App Shell Updated** — `app/app.vue`
+   - Detects authenticated users without gardens → shows placement flow
+   - After garden placement: loads full data + starts realtime subscriptions
+   - `loadFullData()` parallel fetches gardens, events, discoveries
+   - Proper cleanup: `unsubscribeAll()` + `stopBeeAnimation()` on unmount
+
+### Build Status
+- `nuxt generate` produces static output ✅
+- All code pushed to https://github.com/ramonstaal/game-beehive.git ✅
+
+---
+
+## Next Phases
+
+1. **Phase 3** — World simulation tick, weather, bee movement rules
+2. **Phase 4** — Discovery system, events, community stats
+3. **Phase 5** — Sound, polish, accessibility, performance
 
