@@ -63,6 +63,11 @@ export const useUiStore = defineStore('ui', () => {
     }, 4000)
   }
 
+  function dismissDiscovery() {
+    showDiscovery.value = false
+    discoveryData.value = null
+  }
+
   return {
     currentView: readonly(currentView),
     selectedMapObject: readonly(selectedMapObject),
@@ -83,5 +88,6 @@ export const useUiStore = defineStore('ui', () => {
     skipOnboarding,
     showToast,
     triggerDiscovery,
+    dismissDiscovery,
   }
 })

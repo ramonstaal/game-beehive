@@ -16,10 +16,10 @@
           <p class="text-xs text-hive-ink-muted">H3 Cell: {{ pendingCell.cell.slice(0, 12) }}...</p>
         </div>
       </div>
-      <HiveButton variant="primary" class="w-full mb-2" @click="confirm">
-        🌱 Plant Here
+      <HiveButton variant="primary" class="w-full mb-2" :disabled="isPlacing" @click="confirm">
+        {{ isPlacing ? '🌱 Planting...' : '🌱 Plant Here' }}
       </HiveButton>
-      <HiveButton variant="ghost" class="w-full text-sm" @click="cancel">
+      <HiveButton variant="ghost" class="w-full text-sm" :disabled="isPlacing" @click="cancel">
         Choose Another Spot
       </HiveButton>
     </div>
@@ -47,6 +47,7 @@ const { getCellCenter } = useH3()
 
 const gardenName = ref('')
 const pendingCell = ref<{ lat: number; lng: number; cell: string } | null>(null)
+const isPlacing = ref(false)
 
 // Set initial cell from props
 onMounted(() => {
@@ -58,13 +59,15 @@ watch(() => [props.lat, props.lng], ([lat, lng]) => {
 })
 
 async function confirm() {
-  if (!pendingCell.value) return
+  if (!pendingCell.value || isPlacing.value) return
+  isPlacing.value = true
   const result = await garden.createGarden(
     pendingCell.value.cell,
     gardenName.value || 'My Garden',
     pendingCell.value.lat,
     pendingCell.value.lng
   )
+  isPlacing.value = false
   if (result.success) {
     ui.showToast('Your garden is planted! 🌱', '🏡')
     emit('placed')

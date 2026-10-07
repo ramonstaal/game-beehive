@@ -1,6 +1,11 @@
 <template>
   <div class="hive-sheet p-4 pb-24 max-h-[70vh] overflow-y-auto" @click.stop>
     <div class="w-12 h-1 bg-hive-ink/10 rounded-full mx-auto mb-4" />
+    <button
+      class="absolute top-3 right-4 w-8 h-8 rounded-hive-pill bg-white/80 text-hive-ink-muted hover:text-hive-ink flex items-center justify-center text-lg leading-none shadow-hive-soft"
+      aria-label="Close"
+      @click="ui.closeSheet"
+    >×</button>
     <h2 class="font-display font-bold text-xl text-hive-ink mb-4">Field Journal</h2>
 
     <div class="grid grid-cols-2 gap-2 mb-4">
@@ -32,6 +37,8 @@
 
 <script setup lang="ts">
 import { useJournalStore } from '~/stores/journal'
+import { useUiStore } from '~/stores/ui'
 
 const journal = useJournalStore()
+const ui = useUiStore()
 </script>

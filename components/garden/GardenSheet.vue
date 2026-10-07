@@ -1,6 +1,11 @@
 <template>
   <div class="hive-sheet p-4 pb-24" @click.stop>
     <div class="w-12 h-1 bg-hive-ink/10 rounded-full mx-auto mb-4" />
+    <button
+      class="absolute top-3 right-4 w-8 h-8 rounded-hive-pill bg-white/80 text-hive-ink-muted hover:text-hive-ink flex items-center justify-center text-lg leading-none shadow-hive-soft"
+      aria-label="Close"
+      @click="ui.closeSheet"
+    >×</button>
 
     <div class="flex items-center gap-3 mb-4">
       <div class="w-12 h-12 rounded-hive-md bg-gradient-to-br from-hive-leaf to-hive-leaf-deep flex items-center justify-center text-2xl shadow-hive-soft">

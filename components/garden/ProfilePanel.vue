@@ -7,7 +7,7 @@
         🐝
       </div>
       <h3 class="font-display font-bold text-lg">{{ player.profile?.username || 'Beekeeper' }}</h3>
-      <p class="text-sm text-hive-ink-muted">Active since {{ formatDate(player.profile?.createdAt) }}</p>
+      <p class="text-sm text-hive-ink-muted">Active since {{ formatDate(player.profile?.created_at) }}</p>
     </HiveCard>
 
     <div class="space-y-2">
@@ -46,8 +46,10 @@ const garden = useGardenStore()
 const journal = useJournalStore()
 const ui = useUiStore()
 
-function formatDate(date: Date | undefined) {
+function formatDate(date: string | Date | undefined) {
   if (!date) return 'recently'
-  return new Intl.DateTimeFormat('en-US', { month: 'short', year: 'numeric' }).format(date)
+  const d = date instanceof Date ? date : new Date(date)
+  if (isNaN(d.getTime())) return 'recently'
+  return new Intl.DateTimeFormat('en-US', { month: 'short', year: 'numeric' }).format(d)
 }
 </script>

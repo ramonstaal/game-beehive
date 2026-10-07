@@ -57,15 +57,24 @@ export function useHiveMap() {
 
     mapInstance.value = map
 
+    // Registry of click callbacks -> their map wrappers, so listeners can be removed correctly
+    const clickHandlers = new Map<(lng: number, lat: number) => void, (e: maplibregl.MapMouseEvent) => void>()
+
     return {
       map,
       addGardenMarkers: (gardens: any[], onClick?: (garden: any) => void) => addGardenMarkers(map, gardens, onClick),
       addBeeFlowLayer: (flows: any[]) => addBeeFlowLayer(map, flows),
       addClickListener: (callback: (lng: number, lat: number) => void) => {
-        map.on('click', (e) => callback(e.lngLat.lng, e.lngLat.lat))
+        const wrapper = (e: maplibregl.MapMouseEvent) => callback(e.lngLat.lng, e.lngLat.lat)
+        clickHandlers.set(callback, wrapper)
+        map.on('click', wrapper)
       },
       removeClickListener: (callback: (lng: number, lat: number) => void) => {
-        map.off('click', callback as any)
+        const wrapper = clickHandlers.get(callback)
+        if (wrapper) {
+          map.off('click', wrapper)
+          clickHandlers.delete(callback)
+        }
       },
       onMoveEnd: (callback: () => void) => {
         map.on('moveend', callback)
