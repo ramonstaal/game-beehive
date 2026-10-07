@@ -1,19 +1,22 @@
 <template>
   <div class="hive-app">
+    <!-- Auth Modal -->
+    <AuthModal v-if="showAuth" />
+
     <!-- Onboarding Overlay -->
-    <OnboardingFlow v-if="ui.isOnboarding" />
-
-    <!-- Toast -->
-    <HiveToast v-if="ui.toastMessage" :message="ui.toastMessage" :icon="ui.toastIcon" />
-
-    <!-- Discovery Card -->
-    <DiscoveryCard
-      v-if="ui.showDiscovery && ui.discoveryData"
-      v-bind="ui.discoveryData"
-    />
+    <OnboardingFlow v-else-if="ui.isOnboarding" />
 
     <!-- Main App Layout -->
     <template v-else>
+      <!-- Toast -->
+      <HiveToast v-if="ui.toastMessage" :message="ui.toastMessage" :icon="ui.toastIcon" />
+
+      <!-- Discovery Card -->
+      <DiscoveryCard
+        v-if="ui.showDiscovery && ui.discoveryData"
+        v-bind="ui.discoveryData"
+      />
+
       <!-- Desktop: Side panels + Map -->
       <div class="hidden lg:flex h-screen w-screen overflow-hidden">
         <!-- Left Panel -->
@@ -85,8 +88,28 @@ const world = useWorldStore()
 const journal = useJournalStore()
 const ui = useUiStore()
 
-onMounted(() => {
-  player.initDemoPlayer()
+const isReady = ref(false)
+
+const showAuth = computed(() => {
+  return isReady.value && !player.isAuthenticated && !player.profile
+})
+
+onMounted(async () => {
+  // Initialize auth state
+  await player.initAuth()
+  isReady.value = true
+
+  // If authenticated, fetch real data
+  if (player.isAuthenticated) {
+    await garden.fetchMyGarden()
+    await world.fetchGardens()
+    await world.fetchEvents()
+    await journal.fetchDiscoveries()
+  } else if (!player.profile) {
+    // Not authenticated and not in demo mode - will show auth modal
+  }
+
+  // Start animations
   world.startBeeAnimation()
 })
 
