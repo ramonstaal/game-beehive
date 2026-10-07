@@ -6,6 +6,19 @@
     <!-- Onboarding Overlay -->
     <OnboardingFlow v-else-if="ui.isOnboarding" />
 
+    <!-- Garden Placement -->
+    <template v-else-if="needsGardenPlacement">
+      <div class="h-screen w-screen relative">
+        <HiveMap />
+        <GardenPlacement
+          :lat="placementLat"
+          :lng="placementLng"
+          @placed="onGardenPlaced"
+          @cancel="onPlacementCancelled"
+        />
+      </div>
+    </template>
+
     <!-- Main App Layout -->
     <template v-else>
       <!-- Toast -->
@@ -89,6 +102,10 @@ const journal = useJournalStore()
 const ui = useUiStore()
 
 const isReady = ref(false)
+const hasCheckedGarden = ref(false)
+const needsGardenPlacement = ref(false)
+const placementLat = ref(52.09)
+const placementLng = ref(5.12)
 
 const showAuth = computed(() => {
   return isReady.value && !player.isAuthenticated && !player.profile
@@ -99,23 +116,57 @@ onMounted(async () => {
   await player.initAuth()
   isReady.value = true
 
-  // If authenticated, fetch real data
   if (player.isAuthenticated) {
+    // Check if user has a garden
     await garden.fetchMyGarden()
-    await world.fetchGardens()
-    await world.fetchEvents()
-    await journal.fetchDiscoveries()
-  } else if (!player.profile) {
-    // Not authenticated and not in demo mode - will show auth modal
-  }
+    hasCheckedGarden.value = true
 
-  // Start animations
-  world.startBeeAnimation()
+    // If garden ID is still the demo one, user has no real garden
+    if (garden.garden.id === 'garden-player') {
+      needsGardenPlacement.value = true
+      ui.openSheetById('place-garden')
+    } else {
+      // User has a garden - load full data and start realtime
+      await loadFullData()
+    }
+  } else if (player.profile) {
+    // Demo mode - use demo data but still fetch nearby real gardens
+    await world.fetchGardens()
+    world.startBeeAnimation()
+  } else {
+    // Not authenticated - will show auth modal
+  }
 })
 
 onBeforeUnmount(() => {
   world.stopBeeAnimation()
+  world.unsubscribeAll()
 })
+
+async function loadFullData() {
+  await Promise.all([
+    world.fetchGardens(),
+    world.fetchEvents(),
+    journal.fetchDiscoveries(),
+  ])
+  world.startBeeAnimation()
+  world.subscribeToGardens()
+  world.subscribeToEvents()
+}
+
+function onGardenPlaced() {
+  needsGardenPlacement.value = false
+  ui.closeSheet()
+  loadFullData()
+}
+
+function onPlacementCancelled() {
+  // Allow user to explore without placing a garden
+  needsGardenPlacement.value = false
+  ui.closeSheet()
+  player.initDemoPlayer()
+  world.startBeeAnimation()
+}
 </script>
 
 <style>

@@ -106,10 +106,20 @@ Auth, garden persistence, flowers, hive, honey, journal — all backed by Supaba
 
 ---
 
-## Next Phases
+## Phase 2 — Shared World 🚧 IN PROGRESS
 
-1. **Phase 2** — Shared world, multiple gardens, realtime updates
-2. **Phase 3** — World simulation tick, weather, bee movement rules
-3. **Phase 4** — Discovery system, events, community stats
-4. **Phase 5** — Sound, polish, accessibility, performance
+### Goal
+Multiple gardens, world cells, aggregate bee flow, realtime, region filtering.
+
+### Acceptance
+> Two browsers in different accounts can see the same garden activity and bee flows.
+
+### Plan
+1. **H3 Integration** — Use h3-js for cell-based garden placement
+2. **Garden Placement Flow** — Click map → snap to H3 cell → create garden
+3. **Region-based Queries** — Load only gardens/cells in viewport
+4. **Realtime Subscriptions** — Live updates for gardens, flowers, events
+5. **Shared Garden Visibility** — Show other players' gardens with owner names
+6. **Bee Flows from DB** — Load real aggregate bee flows
+7. **Interactive Map** — Click gardens to inspect, click map to place
 
