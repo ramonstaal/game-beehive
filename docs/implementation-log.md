@@ -165,9 +165,65 @@ Multiple gardens, world cells, aggregate bee flow, realtime, region filtering.
 
 ---
 
+## Phase 3 — World Simulation ✅ COMPLETE
+
+### Goal
+Scheduled world tick, flower attraction, weather, movement rules, lazy simulation.
+
+### Acceptance
+> The world changes without direct player interaction.
+
+### What Was Built
+
+1. **Supabase Edge Function** — `supabase/functions/world-tick/index.ts`
+   - Runs every minute via pg_cron
+   - Loads all gardens and their H3 cells
+   - Reads flower species catalog and blooming flowers per garden
+   - Calculates attraction scores per cell
+   - Determines regional weather per cell (hash of cell ID + time)
+   - Updates bee populations, nectar, pollen, activity scores
+   - Generates bee flows between random garden cells
+   - Converts nectar to honey in player hives
+   - Cleans up bee flows older than 24 hours
+   - Records each tick in `game_ticks` table
+   - Deployed: https://supabase.com/dashboard/project/qpvizapftjjjcupojbpl/functions
+
+2. **pg_cron Schedule** — `supabase/migrations/20261007130000_setup_pg_cron.sql`
+   - Enables `pg_cron` + `pg_net` extensions
+   - `trigger_world_tick()` function calls Edge Function via HTTP
+   - `cron.schedule('world-tick-every-minute', '* * * * *', ...)` runs every minute
+
+3. **Simulation Domain Logic** — `app/lib/game/simulation/simulation.ts`
+   - `calculateWeather(h3Cell, timestamp)` — deterministic weather per cell
+   - `weatherMultiplier(weather)` — sunny 1.0, cloudy 0.8, rain 0.6, windy 0.9, night 0.5
+   - `calculateAttraction(flowers, weather, hourOfDay)` — flower scores weighted by weather + time
+   - `simulateCell(input)` — full cell simulation with flows, nectar, pollen, honey
+   - `shouldDiscover(chance, existingCount)` — rarity-based discovery roll
+   - Pure functions, unit-testable without Vue or Supabase
+
+4. **World Store Updated** — `app/stores/world.ts`
+   - `fetchWorldCells(cells[])` — loads cell data with weather from DB
+   - `fetchWorldCellsInBounds(minLat, maxLat, minLng, maxLng)` — viewport-filtered cell query
+   - `fetchLatestTick()` — gets most recent completed tick
+   - `subscribeToWorldCells()` — realtime updates when any cell changes
+   - `subscribeToBeeFlows()` — realtime updates when new flows are created
+   - `weatherIcon` / `weatherLabel` computed for UI display
+   - `latestTick` tracking
+
+5. **App Shell Updated** — `app/app.vue`
+   - After garden placement: calls `world.subscribeToWorldCells()` + `world.subscribeToBeeFlows()`
+   - Loads `fetchLatestTick()` alongside other data
+
+### Build Status
+- `nuxt generate` produces static output ✅
+- Edge Function deployed to Supabase ✅
+- pg_cron migration applied ✅
+- All code pushed to https://github.com/ramonstaal/game-beehive.git ✅
+
+---
+
 ## Next Phases
 
-1. **Phase 3** — World simulation tick, weather, bee movement rules
-2. **Phase 4** — Discovery system, events, community stats
-3. **Phase 5** — Sound, polish, accessibility, performance
+1. **Phase 4** — Discovery system, events, community stats
+2. **Phase 5** — Sound, polish, accessibility, performance
 
