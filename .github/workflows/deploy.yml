@@ -34,7 +34,7 @@ jobs:
       - name: Build Nuxt
         run: npx nuxt build --preset github_pages
         env:
-          NUXT_APP_BASE_URL: /hive/
+          NUXT_APP_BASE_URL: /game-beehive/
           NUXT_PUBLIC_SUPABASE_URL: ${{ vars.NUXT_PUBLIC_SUPABASE_URL }}
           NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ vars.NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
           NUXT_PUBLIC_MAPTILER_KEY: ${{ vars.NUXT_PUBLIC_MAPTILER_KEY }}
