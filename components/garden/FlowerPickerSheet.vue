@@ -18,7 +18,9 @@
           :disabled="garden.availableSlots <= 0 || isPlanting"
           @click="plant(species)"
         >
-          <div class="text-3xl mb-2">{{ species.visualKey }}</div>
+          <div class="h-14 mb-1 flex items-end justify-center">
+            <FlowerIcon :species-id="species.id" class="h-full" />
+          </div>
           <p class="font-display font-semibold text-sm">{{ species.name }}</p>
           <p class="text-xs text-hive-ink-muted mb-2">{{ species.description }}</p>
           <div class="flex flex-wrap gap-1">
@@ -57,8 +59,8 @@ async function plant(species: FlowerSpecies) {
   isPlanting.value = false
 
   if (success) {
-    ui.showToast(`Planted ${species.name}!`, species.visualKey)
     ui.closeSheet()
+    ui.triggerPlantCelebration(species.id, species.name, species.description)
   } else {
     ui.showToast('That did not work — try again', '⚠️')
   }

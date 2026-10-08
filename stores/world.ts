@@ -23,10 +23,42 @@ export const useWorldStore = defineStore('world', () => {
   const weatherIcon = computed(() => ({ sunny: '☀️', cloudy: '⛅', rain: '🌧️', windy: '💨', night: '🌙' }[currentWeather.value]))
   const weatherLabel = computed(() => ({ sunny: 'Sunny', cloudy: 'Cloudy', rain: 'Rainy', windy: 'Windy', night: 'Night' }[currentWeather.value]))
 
+  function gardensInBounds(minLat: number, maxLat: number, minLng: number, maxLng: number, list: Garden[]) {
+    return list.filter(g =>
+      g.lat >= minLat && g.lat <= maxLat && g.lng >= minLng && g.lng <= maxLng,
+    )
+  }
+
+  function mergeWithDemoGardens(remote: Garden[], minLat: number, maxLat: number, minLng: number, maxLng: number) {
+    const config = useRuntimeConfig()
+    const devMode = config.public.devMode === 'true' || config.public.devMode === true
+    const demo = gardensInBounds(minLat, maxLat, minLng, maxLng, DEMO_GARDENS)
+    if (!devMode && remote.length > 0) return remote
+    const byId = new Map<string, Garden>()
+    for (const g of demo) byId.set(g.id, g)
+    for (const g of remote) byId.set(g.id, g)
+    return [...byId.values()]
+  }
+
   async function fetchGardensInBounds(minLat: number, maxLat: number, minLng: number, maxLng: number) {
     isLoading.value = true
     const { data } = await supabase.from('gardens').select('*, profiles:owner_id(username)').gte('lat', minLat).lte('lat', maxLat).gte('lng', minLng).lte('lng', maxLng).limit(100)
-    if (data) gardens.value = data.map((g: any) => ({ id: g.id, ownerId: g.owner_id, ownerName: g.profiles?.username || 'Someone', h3Cell: g.h3_cell, lat: g.lat, lng: g.lng, name: g.name, bloomScore: g.bloom_score, flowerCount: g.flower_count, beeCount: g.bee_count, createdAt: new Date(g.created_at) }))
+    const remote = data?.length
+      ? data.map((g: any) => ({
+          id: g.id,
+          ownerId: g.owner_id,
+          ownerName: g.profiles?.username || 'Someone',
+          h3Cell: g.h3_cell,
+          lat: g.lat,
+          lng: g.lng,
+          name: g.name,
+          bloomScore: g.bloom_score,
+          flowerCount: g.flower_count,
+          beeCount: g.bee_count,
+          createdAt: new Date(g.created_at),
+        }))
+      : []
+    gardens.value = mergeWithDemoGardens(remote, minLat, maxLat, minLng, maxLng)
     isLoading.value = false
   }
 
@@ -46,10 +78,30 @@ export const useWorldStore = defineStore('world', () => {
     if (data) worldCells.value = data.map(c => ({ h3Cell: c.h3_cell, resolution: c.resolution, lat: c.lat, lng: c.lng, beePopulation: c.bee_population, nectar: c.nectar, pollen: c.pollen, bloomScore: c.bloom_score, activityScore: c.activity_score, weather: c.weather as WeatherState }))
   }
 
+  function mergeWithDemoBeeFlows(remote: BeeFlow[]) {
+    const config = useRuntimeConfig()
+    const devMode = config.public.devMode === 'true' || config.public.devMode === true
+    if (!devMode && remote.length > 0) return remote
+    const byId = new Map<string, BeeFlow>()
+    for (const f of DEMO_BEE_FLOWS) byId.set(f.id, f)
+    for (const f of remote) byId.set(f.id, f)
+    return [...byId.values()]
+  }
+
   async function fetchBeeFlows(sinceMinutes = 5) {
     const since = new Date(Date.now() - sinceMinutes * 60000).toISOString()
     const { data } = await supabase.from('bee_flows').select('*').gte('created_at', since).order('created_at', { ascending: false }).limit(50)
-    if (data) beeFlows.value = data.map((f: any, i: number) => ({ id: `flow-${f.id}`, from: [f.from_lng || 5.12, f.from_lat || 52.09] as [number, number], to: [f.to_lng || 5.13, f.to_lat || 52.08] as [number, number], beeCount: f.bee_count, type: f.bee_type as BeeFlow['type'], progress: (i % 10) / 10 }))
+    const remote = data?.length
+      ? data.map((f: any, i: number) => ({
+          id: `flow-${f.id}`,
+          from: [f.from_lng, f.from_lat] as [number, number],
+          to: [f.to_lng, f.to_lat] as [number, number],
+          beeCount: f.bee_count,
+          type: f.bee_type as BeeFlow['type'],
+          progress: (i % 10) / 10,
+        })).filter(f => Number.isFinite(f.from[0]) && Number.isFinite(f.from[1]) && Number.isFinite(f.to[0]) && Number.isFinite(f.to[1]))
+      : []
+    beeFlows.value = mergeWithDemoBeeFlows(remote)
   }
 
   async function fetchLatestTick() {
@@ -64,7 +116,7 @@ export const useWorldStore = defineStore('world', () => {
 
   function setVisibleRegion(lat: number, lng: number, zoom: number) { visibleRegion.value = { lat, lng, zoom } }
 
-  function updateBeeFlowProgress() { beeFlows.value = beeFlows.value.map(f => ({ ...f, progress: (f.progress + 0.005) % 1 })) }
+  function updateBeeFlowProgress() { beeFlows.value = beeFlows.value.map(f => ({ ...f, progress: (f.progress + 0.008) % 1 })) }
 
   let animationFrame: number
   function startBeeAnimation() {

@@ -29,7 +29,11 @@
       </HiveCard>
     </div>
 
-    <HiveButton variant="ghost" class="w-full mt-4" @click="ui.showToast('Settings coming soon!', '🔧')">
+    <NuxtLink to="/how-to-play" class="hive-button hive-button--secondary w-full mt-4 inline-flex justify-center">
+      📖 How to play
+    </NuxtLink>
+
+    <HiveButton variant="ghost" class="w-full mt-2" @click="ui.showToast('Settings coming soon!', '🔧')">
       Settings
     </HiveButton>
   </div>

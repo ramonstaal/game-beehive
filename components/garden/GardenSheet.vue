@@ -30,7 +30,7 @@
         <div class="text-[10px] text-hive-ink-muted">Honey</div>
       </div>
       <div class="text-center p-3 rounded-hive-sm bg-hive-warm/50">
-        <div class="text-2xl">🌼</div>
+        <FlowerIcon species-id="wild-daisy" class="h-7 mx-auto" />
         <div class="font-display font-bold">{{ garden.garden.flowerCount }}</div>
         <div class="text-[10px] text-hive-ink-muted">Flowers</div>
       </div>
@@ -44,7 +44,7 @@
         :key="flower.id"
         class="flex-shrink-0 w-16 h-16 rounded-hive-md bg-hive-warm/50 flex flex-col items-center justify-center"
       >
-        <span class="text-2xl hive-flower">{{ getFlowerIcon(flower.speciesId) }}</span>
+        <FlowerIcon :species-id="flower.speciesId" :state="flower.state" class="w-11 h-11 hive-flower" />
         <span class="text-[10px] text-hive-ink-muted capitalize">{{ flower.state }}</span>
       </div>
       <button
@@ -65,14 +65,9 @@
 <script setup lang="ts">
 import { useGardenStore } from '~/stores/garden'
 import { useUiStore } from '~/stores/ui'
-import { DEMO_FLOWER_SPECIES } from '~/lib/game/fixtures-species'
 
 const garden = useGardenStore()
 const ui = useUiStore()
-
-function getFlowerIcon(speciesId: string) {
-  return DEMO_FLOWER_SPECIES.find(s => s.id === speciesId)?.visualKey || '🌱'
-}
 
 function openPicker() {
   ui.closeSheet()

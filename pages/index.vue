@@ -30,8 +30,13 @@
         v-bind="ui.discoveryData"
       />
 
+      <PlantCelebration
+        v-if="ui.showPlantCelebration && ui.plantCelebrationData"
+        v-bind="ui.plantCelebrationData"
+      />
+
       <!-- Desktop: Side panels + Map -->
-      <div class="hidden lg:flex h-screen w-screen overflow-hidden">
+      <div v-if="isDesktop" class="flex h-screen w-screen overflow-hidden">
         <!-- Left Panel -->
         <aside class="w-80 flex-shrink-0 hive-panel m-3 flex flex-col gap-3 overflow-hidden">
           <AppHeader />
@@ -60,7 +65,7 @@
       </div>
 
       <!-- Mobile: Full screen map + overlays -->
-      <div class="lg:hidden h-screen w-screen relative overflow-hidden">
+      <div v-else class="h-screen w-screen relative overflow-hidden">
         <HiveMap />
 
         <!-- Top stats bar -->
@@ -109,6 +114,15 @@ const needsGardenPlacement = ref(false)
 const placementLat = ref(52.09)
 const placementLng = ref(5.12)
 
+// Render exactly one layout (and thus one HiveMap instance) at a time.
+// CSS-only hiding (hidden lg:flex) still mounts the component, which
+// created a second, hidden map instance that stole markers and listeners.
+const isDesktop = ref(true)
+let mediaQuery: MediaQueryList | null = null
+const onMediaChange = (e: MediaQueryListEvent) => {
+  isDesktop.value = e.matches
+}
+
 const showAuth = computed(() => {
   return isReady.value && !player.isAuthenticated && !player.profile
 })
@@ -128,6 +142,27 @@ watch(() => ui.selectedMapObject, (val) => {
 })
 
 onMounted(async () => {
+  mediaQuery = window.matchMedia('(min-width: 1024px)')
+  isDesktop.value = mediaQuery.matches
+  mediaQuery.addEventListener('change', onMediaChange)
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    ui.isReducedMotion = true
+  }
+
+  const config = useRuntimeConfig()
+  const isDevMode = config.public.devMode === 'true' || config.public.devMode === true
+
+  if (isDevMode) {
+    // Dev mode: skip auth and onboarding, go straight to demo gameplay
+    player.initDemoPlayer()
+    ui.skipOnboarding()
+    isReady.value = true
+    await world.fetchGardens()
+    world.startBeeAnimation()
+    return
+  }
+
   // Initialize auth state
   await player.initAuth()
   isReady.value = true
@@ -155,6 +190,7 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(() => {
+  mediaQuery?.removeEventListener('change', onMediaChange)
   world.stopBeeAnimation()
   world.unsubscribeAll()
 })

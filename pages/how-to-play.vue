@@ -82,45 +82,16 @@
       <section class="hive-card p-6">
         <h2 class="font-display font-bold text-2xl text-hive-ink mb-4">🌼 Flower Species</h2>
         <div class="grid grid-cols-2 gap-2">
-          <div class="p-2 rounded-hive-sm bg-hive-warm/50 text-center">
-            <div class="text-2xl">🍀</div>
-            <p class="font-display font-semibold text-sm">Clover</p>
-            <p class="text-xs text-hive-ink-muted">Reliable & resilient</p>
-          </div>
-          <div class="p-2 rounded-hive-sm bg-hive-warm/50 text-center">
-            <div class="text-2xl">💜</div>
-            <p class="font-display font-semibold text-sm">Lavender</p>
-            <p class="text-xs text-hive-ink-muted">Strong attraction</p>
-          </div>
-          <div class="p-2 rounded-hive-sm bg-hive-warm/50 text-center">
-            <div class="text-2xl">🌻</div>
-            <p class="font-display font-semibold text-sm">Sunflower</p>
-            <p class="text-xs text-hive-ink-muted">High nectar</p>
-          </div>
-          <div class="p-2 rounded-hive-sm bg-hive-warm/50 text-center">
-            <div class="text-2xl">🌼</div>
-            <p class="font-display font-semibold text-sm">Wild Daisy</p>
-            <p class="text-xs text-hive-ink-muted">Diversity bonus</p>
-          </div>
-          <div class="p-2 rounded-hive-sm bg-hive-warm/50 text-center">
-            <div class="text-2xl">🌺</div>
-            <p class="font-display font-semibold text-sm">Poppy</p>
-            <p class="text-xs text-hive-ink-muted">Burst production</p>
-          </div>
-          <div class="p-2 rounded-hive-sm bg-hive-warm/50 text-center">
-            <div class="text-2xl">🌿</div>
-            <p class="font-display font-semibold text-sm">Mint Bloom</p>
-            <p class="text-xs text-hive-ink-muted">Weather synergy</p>
-          </div>
-          <div class="p-2 rounded-hive-sm bg-hive-warm/50 text-center">
-            <div class="text-2xl">🌙</div>
-            <p class="font-display font-semibold text-sm">Moonflower</p>
-            <p class="text-xs text-hive-ink-muted">Night bees</p>
-          </div>
-          <div class="p-2 rounded-hive-sm bg-hive-warm/50 text-center">
-            <div class="text-2xl">✨</div>
-            <p class="font-display font-semibold text-sm">Golden Aster</p>
-            <p class="text-xs text-hive-ink-muted">Rare & precious</p>
+          <div
+            v-for="species in speciesShowcase"
+            :key="species.id"
+            class="p-2 rounded-hive-sm bg-hive-warm/50 text-center"
+          >
+            <div class="h-12 flex items-end justify-center mb-1">
+              <FlowerIcon :species-id="species.id" class="h-full" />
+            </div>
+            <p class="font-display font-semibold text-sm">{{ species.name }}</p>
+            <p class="text-xs text-hive-ink-muted">{{ species.tagline }}</p>
           </div>
         </div>
       </section>
@@ -158,7 +129,16 @@
 </template>
 
 <script setup lang="ts">
-// Static page — no reactive state needed
+const speciesShowcase = [
+  { id: 'clover', name: 'Clover', tagline: 'Reliable & resilient' },
+  { id: 'lavender', name: 'Lavender', tagline: 'Strong attraction' },
+  { id: 'sunflower', name: 'Sunflower', tagline: 'High nectar' },
+  { id: 'wild-daisy', name: 'Wild Daisy', tagline: 'Diversity bonus' },
+  { id: 'poppy', name: 'Poppy', tagline: 'Burst production' },
+  { id: 'mint-bloom', name: 'Mint Bloom', tagline: 'Weather synergy' },
+  { id: 'moonflower', name: 'Moonflower', tagline: 'Night bees' },
+  { id: 'golden-aster', name: 'Golden Aster', tagline: 'Rare & precious' },
+]
 </script>
 
 <style>

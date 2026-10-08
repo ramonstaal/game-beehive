@@ -27,7 +27,7 @@
             <div class="text-[10px] text-hive-ink-muted">Honey</div>
           </div>
           <div class="text-center p-2 rounded-hive-sm bg-hive-warm/50">
-            <div class="text-lg">🌼</div>
+            <FlowerIcon species-id="wild-daisy" class="h-6 mx-auto" />
             <div class="font-display font-bold text-sm">{{ garden.garden.flowerCount }}</div>
             <div class="text-[10px] text-hive-ink-muted">Flowers</div>
           </div>
@@ -40,7 +40,7 @@
             :key="flower.id"
             class="flex-shrink-0 w-14 h-14 rounded-hive-md bg-hive-warm/50 flex flex-col items-center justify-center"
           >
-            <span class="text-xl hive-flower">{{ getFlowerIcon(flower.speciesId) }}</span>
+            <FlowerIcon :species-id="flower.speciesId" :state="flower.state" class="w-10 h-10 hive-flower" />
             <span class="text-[9px] text-hive-ink-muted capitalize">{{ flower.state }}</span>
           </div>
         </div>
@@ -85,18 +85,16 @@
 import { useGardenStore } from '~/stores/garden'
 import { useWorldStore } from '~/stores/world'
 import { useUiStore } from '~/stores/ui'
-import { DEMO_FLOWER_SPECIES } from '~/lib/game/fixtures-species'
 
 const garden = useGardenStore()
 const world = useWorldStore()
 const ui = useUiStore()
 
-function getFlowerIcon(speciesId: string) {
-  return DEMO_FLOWER_SPECIES.find(s => s.id === speciesId)?.visualKey || '🌱'
-}
-
 function selectGarden(id: string) {
+  const g = world.gardens.find(g => g.id === id)
+  if (!g) return
   garden.selectGarden(id)
-  ui.showToast(`Visiting ${world.gardens.find(g => g.id === id)?.name}`, '🏡')
+  ui.selectMapObject(id)
+  ui.showToast(`${g.name} · ${g.flowerCount} flowers · ${g.beeCount} bees · by ${g.ownerName}`, '🏡')
 }
 </script>

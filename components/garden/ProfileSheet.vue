@@ -33,6 +33,14 @@
         <span class="font-display font-bold">{{ journal.discoveries.length }}</span>
       </HiveCard>
     </div>
+
+    <NuxtLink
+      to="/how-to-play"
+      class="hive-button hive-button--secondary w-full mt-4 inline-flex justify-center"
+      @click="ui.closeSheet"
+    >
+      📖 How to play
+    </NuxtLink>
   </div>
 </template>
 

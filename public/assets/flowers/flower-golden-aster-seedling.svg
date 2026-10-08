@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="23.4" height="30.9" fill="none" viewBox="8.53 89.07 23.38 30.92">
+  <defs>
+    <radialGradient id="paint0_radial_3244_57461" cx="0" cy="0" r="1" gradientTransform="matrix(1.512e-15 24.69 -24.25 1.485e-15 60.57 29.49)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#CCEAF7" offset="0"/>
+      <stop stop-color="#C2E8F9" offset=".6719"/>
+      <stop stop-color="#CCEAF7" stop-opacity="0" offset="1"/>
+    </radialGradient>
+    <linearGradient id="paint1_linear_3244_57461" x1="38.18" x2="38.18" y1="7.741" y2="22.65" gradientTransform="scale(1.6)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F4FAFE" offset="0"/>
+      <stop stop-color="#D8F0FD" offset=".2552"/>
+      <stop stop-color="#FEFBE5" offset=".526"/>
+      <stop stop-color="#F4FAFE" offset=".7656"/>
+      <stop stop-color="#F8FCFE" offset="1"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="19.84" cy="116.3" rx="7.375" ry="1.688" fill="#DFC9A6"/>
+  <path d="m23.95 91.1c-2.848 0.608-5.824 4.72-5.04 8.432-0.352 1.872-0.368 3.952-0.272 5.456-1.104-5.072-5.648-6.864-7.568-6.368-0.544 0.16-0.32 0.848-0.032 1.44 1.12 2.576 3.968 4.368 6.304 4.608 1.648 2.288 1.504 7.232 1.408 9.968 0.176 1.024 1.728 1.072 1.792 0.208-0.4-3.168 0.112-6.24 1.504-7.664 4.096-0.512 7.056-4.096 7.696-6.48 0.16-0.496-0.448-0.688-1.2-0.688-3.552 0-7.28 2.816-7.424 6.16-0.544 0.768-0.944 1.904-1.184 2.8-0.48-3.424-0.704-7.296-0.208-9.344 3.408-2.288 4.752-6.992 4.688-8.128 0-0.272-0.208-0.432-0.464-0.4z" fill="#709B4D" stroke="#1D3220" stroke-width=".675"/>
+  <path d="m12.14 99.7c1.504 1.296 3.712 2.88 5.12 3.552" stroke="#527436" stroke-linecap="round" stroke-width=".45"/>
+  <path d="m23.84 92.22c-1.312 1.952-3.408 5.024-4.16 6.736" stroke="#4F7236" stroke-linecap="round" stroke-width=".45"/>
+  <path d="m28.27 101.2c-2.528 1.024-5.408 3.392-6.432 5.264" stroke="#4B6F34" stroke-linecap="round" stroke-width=".45"/>
+  <path d="m17.39 114.3c-0.944 0.512-1.36 1.264-1.232 1.712 0.256 0.608 2.176 0.816 3.44 0.816 1.968 0 3.536-0.336 3.552-0.96 0.048-0.736-0.848-1.456-1.552-1.568-0.96 0.864-3.04 0.624-4.208 0z" fill="#866D3E" stroke="#272D1F" stroke-width=".625"/>
+</svg>

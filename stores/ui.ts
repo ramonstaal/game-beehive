@@ -13,6 +13,14 @@ export const useUiStore = defineStore('ui', () => {
   const toastIcon = ref<string>('')
   const showDiscovery = ref(false)
   const discoveryData = ref<{ name: string; description: string; icon: string } | null>(null)
+  const showPlantCelebration = ref(false)
+  const plantCelebrationData = ref<{
+    speciesId: string
+    speciesName: string
+    description?: string
+  } | null>(null)
+
+  let plantCelebrationTimer: ReturnType<typeof setTimeout> | null = null
 
   const isMobile = computed(() => {
     if (typeof window === 'undefined') return false
@@ -68,6 +76,28 @@ export const useUiStore = defineStore('ui', () => {
     discoveryData.value = null
   }
 
+  function triggerPlantCelebration(
+    speciesId: string,
+    speciesName: string,
+    description?: string,
+  ) {
+    if (plantCelebrationTimer) clearTimeout(plantCelebrationTimer)
+    plantCelebrationData.value = { speciesId, speciesName, description }
+    showPlantCelebration.value = true
+    plantCelebrationTimer = setTimeout(() => {
+      dismissPlantCelebration()
+    }, 8000)
+  }
+
+  function dismissPlantCelebration() {
+    if (plantCelebrationTimer) {
+      clearTimeout(plantCelebrationTimer)
+      plantCelebrationTimer = null
+    }
+    showPlantCelebration.value = false
+    plantCelebrationData.value = null
+  }
+
   return {
     currentView: readonly(currentView),
     selectedMapObject: readonly(selectedMapObject),
@@ -79,6 +109,8 @@ export const useUiStore = defineStore('ui', () => {
     toastIcon: readonly(toastIcon),
     showDiscovery: readonly(showDiscovery),
     discoveryData: readonly(discoveryData),
+    showPlantCelebration: readonly(showPlantCelebration),
+    plantCelebrationData: readonly(plantCelebrationData),
     isMobile,
     setView,
     selectMapObject,
@@ -89,5 +121,7 @@ export const useUiStore = defineStore('ui', () => {
     showToast,
     triggerDiscovery,
     dismissDiscovery,
+    triggerPlantCelebration,
+    dismissPlantCelebration,
   }
 })

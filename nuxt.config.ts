@@ -47,6 +47,7 @@ export default defineNuxtConfig({
       supabaseUrl: process.env.NUXT_PUBLIC_SUPABASE_URL || '',
       supabasePublishableKey: process.env.NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || '',
       maptilerKey: process.env.NUXT_PUBLIC_MAPTILER_KEY || '',
+      devMode: process.env.NUXT_PUBLIC_DEV_MODE || 'false',
     },
   },
 })
